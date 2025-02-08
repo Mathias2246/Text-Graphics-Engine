@@ -1,9 +1,15 @@
-﻿
+﻿/* -----------------------------------------------------------------------------------------------
+ * TGE - Text Graphics Engine v1.0.0 beta-0   |   MIT License  -  Copyright (c) 2025 Mathias2246
+ * -----------------------------------------------------------------------------------------------
+ */
+
+#region UsingDirectives
 using System.Text.Json;
 using System.Numerics;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+#endregion
 
 namespace TextGraphics
 {
@@ -49,7 +55,7 @@ namespace TextGraphics
     }
 
     /// <summary>
-    /// A two-dimensional Vector that consists of two <see langword="int"/>s
+    /// A two-dimensional Vector that consists of two 32-Bit integers
     /// </summary>
     /// <param name="x">The x value of the <see cref="Vector2Int"/></param>
     /// <param name="y">The y value of the <see cref="Vector2Int"/></param>
@@ -61,6 +67,9 @@ namespace TextGraphics
         public int x = x;
         public int y = y;
 
+        /// <summary>
+        /// A <see cref="Vector2Int"/> with the values 0, 0
+        /// </summary>
         public static readonly Vector2Int Zero = new(0, 0);
 
         public static implicit operator Vector2(Vector2Int v) => new(v.x, v.y);
@@ -74,7 +83,7 @@ namespace TextGraphics
     }
 
     /// <summary>
-    /// A Integer Range
+    /// A range out of two 32-Bit integers
     /// </summary>
     public struct IntRange
     {
@@ -141,18 +150,30 @@ namespace TextGraphics
     /// <param name="bgcolor">The background color of the character</param>
     public partial class TextColor(char character, TextColor.RGBA fgcolor, TextColor.RGBA bgcolor)
     {
-        public char c = character;
+        private char c = character;
+
+        /// <summary>
+        /// Gets/Sets the character of this <see cref="TextColor"/>
+        /// </summary>
         [JsonIgnore]
         public char Character { get => c; set { c = value; _character = (byte)value; } }
         [JsonIgnore]
         private byte _character = (byte)character;
 
+        /// <summary>
+        /// The foreground color of the character
+        /// </summary>
         public RGBA fgColor = fgcolor;
+        /// <summary>
+        /// The background color of the character
+        /// </summary>
         public RGBA bgColor = bgcolor;
 
+        /// <summary>
+        /// The encoded version of this <see cref="TextColor"/> using the default encoding from the windows console
+        /// </summary>
         [JsonIgnore]
         public byte[] Encoded => [27, 91, 51, 56, 59, 50, 59, _bc[fgColor.red][0], _bc[fgColor.red][1], _bc[fgColor.red][2], 59, _bc[fgColor.green][0], _bc[fgColor.green][1], _bc[fgColor.green][2], 59, _bc[fgColor.blue][0], _bc[fgColor.blue][1], _bc[fgColor.blue][2], 109, 27, 91, 52, 56, 59, 50, 59, _bc[bgColor.red][0], _bc[bgColor.red][1], _bc[bgColor.red][2], 59, _bc[bgColor.green][0], _bc[bgColor.green][1], _bc[bgColor.green][2], 59, _bc[bgColor.blue][0], _bc[bgColor.blue][1], _bc[bgColor.blue][2], 109, _character, 27, 91, 48, 109];
-
 
         public override string ToString() => $"\x1B[38;2;{fgColor.red};{fgColor.green};{fgColor.blue}m\x1B[48;2;{bgColor.red};{bgColor.green};{bgColor.blue}m{Character}\u001b[0m";
 
@@ -173,7 +194,7 @@ namespace TextGraphics
         }
 
         /// <summary>
-        /// A RGBA-Color with transparency
+        /// A RGBA-Color
         /// </summary>
         public struct RGBA(byte red, byte green, byte blue, byte alpha)
         {
@@ -273,8 +294,14 @@ namespace TextGraphics
         /// </summary>
         public static readonly TextColor Empty = new(' ', new(255, 255, 255, 255), new(0, 0, 0, 255));
 
+        /// <summary>
+        /// A space with a white foreground and black background
+        /// </summary>
         public const string EmptyString = "\u001b[38;2;255;255;255m\u001b[48;2;0;0;0m \u001b[0m";
 
+        /// <summary>
+        /// An encoded space with a white foreground and black background
+        /// </summary>
         public static readonly byte[] encodedEmptyString = Empty.Encoded;
 
         public const string blackBg = "\x1b[48;2;0;0;0m";
@@ -378,6 +405,7 @@ namespace TextGraphics
             /// <summary>
             /// Creates a <see cref="TextGrid"/> from a grid dictionary
             /// </summary>
+            /// <param name="id">The global id of this grid</param>
             /// <param name="strings">A text grid dictionary</param>
             public TextGrid(string id, Dictionary<Vector2Int, TextColor> strings)
             {
@@ -390,6 +418,9 @@ namespace TextGraphics
             }
         }
 
+        /// <summary>
+        /// A <see cref="Transform"/> that can be used to transform a <see cref="TextGrid"/>
+        /// </summary>
         public class Transform : ISerialization<Transform>
         {
             /// <summary>
@@ -413,7 +444,7 @@ namespace TextGraphics
             /// <param name="position">The position</param>
             /// <param name="rotationPivot">The pivot point that the object rotates around</param>
             /// <param name="rotation">The rotation of the object in degrees</param>
-            /// <param name="parent">The parent of this transform</param>
+            /// <param name="parent">The optional parent of this transform</param>
             /// <param name="rotationLocked">If <see langword="true"/>, the rotation matrix will be locked to the current angle</param>
             public Transform(Vector2Int position, Vector2 rotationPivot, float rotation = 0, Transform? parent = null, bool rotationLocked = false)
             {
@@ -451,14 +482,20 @@ namespace TextGraphics
             private Matrix3x2 ma;
 
             /// <summary>
-            /// The global coordinates relative to the parent
+            /// The global integer-coordinates relative to the parent
             /// </summary>
             [JsonIgnore]
             public Vector2Int GlobalIntCoordinates { get => Parent != null ? (Vector2Int)(Parent.GlobalCoordinates + Position) : (Vector2Int)Position; }
 
+            /// <summary>
+            /// The global coordinates relative to the parent
+            /// </summary>
             [JsonIgnore]
             public Vector2 GlobalCoordinates { get => Parent != null ? Vector2.Transform(Position, RotationMatrix) + Parent.GlobalCoordinates : Position; }
 
+            /// <summary>
+            /// The global rotation matrix of this transform relative to the parent
+            /// </summary>
             [JsonIgnore]
             public virtual Matrix3x2 RotationMatrix => IsRotationLocked ? ma : Matrix3x2.CreateRotation(this.GlobalRotation.DegToRad());
 
@@ -484,7 +521,9 @@ namespace TextGraphics
             /// <summary>
             /// Transforms a <see cref="TextGrid"/>
             /// </summary>
-            /// <param name="grid">The <see cref="TextGrid"/> that should be transformed</param>
+            /// <param name="gridIndex">The global id of the <see cref="TextGrid"/> that should be transformed</param>
+            /// <param name="offset">The offset of the transformation</param>
+            /// <param name="output">The <see cref="TextOutput"/> that the transformed <see cref="TextGrid"/> will be rendered to</param>
             public void TransformToOutput(int gridIndex, ITextRenderer.TextOutput output, Vector2Int offset)
             {
                 Vector2 piv = GlobalRotationPivot;
@@ -521,12 +560,29 @@ namespace TextGraphics
             public static Transform? Deserialize(string data) => JsonSerializer.Deserialize<Transform>(data);
         }
 
+        /// <summary>
+        /// If set to <see langword="true"/>, the <see cref="RenderObject"/> will be hidden
+        /// </summary>
         public bool IsHidden = false;
+
+        /// <summary>
+        /// The Transformation of this <see cref="RenderObject"/>
+        /// </summary>
         public Transform Transformation;
 
+        /// <summary>
+        /// Changes the current <see cref="TextGrid"/> to the one with the given id
+        /// </summary>
+        /// <param name="textGridId"></param>
         public void LoadGrid(string textGridId) => GridIndex = TextGrid.GetIndex(textGridId);
+        /// <summary>
+        /// The index of the <see cref="TextGrid"/> that is getting rendered
+        /// </summary>
         public int GridIndex { get; set; }
 
+        /// <summary>
+        /// The layer number this <see cref="RenderObject"/> should be added to
+        /// </summary>
         public readonly int Layer;
 
         /// <summary>
@@ -539,7 +595,7 @@ namespace TextGraphics
         /// </summary>
         /// <param name="renderLayers">A <see langword="ref"/> to a <see cref="ITextRenderer.RenderLayers"/> object that this <see cref="RenderObject"/> will be added to</param>
         /// <param name="transform">The <see cref="Transform"/> this text will be transformed by</param>
-        /// <param name="text">The <see cref="TextGrid"/> that is getting rendered</param>
+        /// <param name="textGridId">The <see cref="TextGrid"/> that is getting rendered</param>
         /// <param name="layer">The layer number this <see cref="RenderObject"/> should be added to</param>
         /// <param name="isHidden">If <see langword="true"/>, the <see cref="RenderObject"/> will be hidden</param>
         public RenderObject(ITextRenderer.RenderLayers renderLayers, Transform transform, string textGridId, int layer, bool isHidden = false)
@@ -555,7 +611,7 @@ namespace TextGraphics
         /// A constructor that will create a new <see cref="RenderObject"/> without adding it to a <see cref="ITextRenderer.RenderLayers"/>
         /// </summary>
         /// <param name="transform">The <see cref="Transform"/> this text will be transformed by</param>
-        /// <param name="text">The <see cref="TextGrid"/> that is getting rendered</param>
+        /// <param name="textGridId">The <see cref="TextGrid"/> that is getting rendered</param>
         /// <param name="layer">The layer number this <see cref="RenderObject"/> should be added to</param>
         /// <param name="hidden">If <see langword="true"/>, the <see cref="RenderObject"/> will be hidden</param>
         public RenderObject(Transform transform, string textGridId, int layer, bool hidden = false)
@@ -690,8 +746,14 @@ namespace TextGraphics
         {
             private readonly Dictionary<Vector2Int, TextColor> grid = [];
 
+            /// <summary>
+            /// A grid dictionary of the current frame
+            /// </summary>
             public Dictionary<Vector2Int, TextColor> Grid => grid;
 
+            /// <summary>
+            /// The viewport of the <see cref="TextOutput"/>
+            /// </summary>
             public IntRect rect = rect;
 
             /// <summary>
@@ -788,6 +850,10 @@ namespace TextGraphics
 
             private readonly byte[] result = new byte[rect.size.y * rect.size.x * 43 + rect.size.y];
 
+            /// <summary>
+            /// Converts the grid to a byte array
+            /// </summary>
+            /// <returns>A byte array that uses the default windows console encoding</returns>
             public byte[] AsArray()
             {
                 int index = 0;
@@ -834,9 +900,14 @@ namespace TextGraphics
     #endregion
 
     #region Renderers
+    /// <summary>
+    /// Renders Text to the windows Console
+    /// </summary>
     public class ConsoleRenderer : ITextRenderer
     {
-
+        /// <summary>
+        /// A custom Console that allows much faster writing
+        /// </summary>
         public static class FastConsole
         {
             public readonly static BufferedStream str;
@@ -879,10 +950,22 @@ namespace TextGraphics
             public static void Flush() => str.Flush();
         };
 
+        /// <summary>
+        /// The layers that are rendered
+        /// </summary>
         public ITextRenderer.RenderLayers Layers = new();
 
+        /// <summary>
+        /// Adds a <see cref="RenderObject"/> to the <see cref="ITextRenderer.RenderLayers"/>
+        /// </summary>
+        /// <param name="obj">The <see cref="RenderObject"/> to add</param>
         public void AddRenderObject(RenderObject obj) => Layers.AddRenderObject(obj);
 
+        /// <summary>
+        /// Executed after rendering the frame using <see cref="Render(ITextRenderer.TextOutput)"/><br/>
+        /// Also writes the current frame to the console
+        /// </summary>
+        /// <param name="output">The current frame output</param>
         public virtual void AfterRender(ITextRenderer.TextOutput output)
         {
             Console.SetCursorPosition(0, 0);
@@ -891,8 +974,15 @@ namespace TextGraphics
             Clear(output);
         }
 
+        /// <summary>
+        /// The offset of the rendered frame
+        /// </summary>
         public Vector2Int Offset = Vector2Int.Zero;
 
+        /// <summary>
+        /// Renders a new frame to the <see cref="ITextRenderer.TextOutput"/>
+        /// </summary>
+        /// <param name="output">The current frame output</param>
         public virtual void Render(ITextRenderer.TextOutput output)
         {
             foreach (var layer in Layers)
@@ -906,6 +996,11 @@ namespace TextGraphics
             AfterRender(output);
         }
 
+        /// <summary>
+        /// Executed after using the <see cref="AfterRender(ITextRenderer.TextOutput)"/> method<br/>
+        /// Should be used to clear the <see cref="ITextRenderer.TextOutput"/>
+        /// </summary>
+        /// <param name="output">The current frame output</param>
         public virtual void Clear(ITextRenderer.TextOutput output)
         {
             output.Clear();
