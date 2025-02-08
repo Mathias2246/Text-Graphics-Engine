@@ -5,7 +5,7 @@ A Rendering-Engine writen in C# that allows you to render text in your console.
 But it is not just writing text! You are able to transfrom grids of text however you want.
 In the console you can even use colors that support transparency!
 
-![Example Image inside the Console](https://github.com/Mathias2246/Text-Graphics-Engine/example.png)
+![Example Image inside the Console](https://github.com/Mathias2246/Text-Graphics-Engine/blob/master/example.png)
 
 *Why did i do this? I don't know...*
 
