@@ -26,7 +26,8 @@ If a Transform has a Parent all values are going to be relative to the position 
 of the parent and its parents.
 
 Here is a very simple example on how to use TGE with a single RenderObject
-´´´csharp
+
+
     using TextGraphics;
     
     internal class Example
@@ -70,11 +71,12 @@ Here is a very simple example on how to use TGE with a single RenderObject
 	        }
 	    }
     }
-´´´
+
+
 ***
 ## Loading Images as Grids
 Maybe you want to load a png or bitmap into TGE so i wrote a simple solution using SixLabors.ImageSharp (https://github.com/SixLabors/ImageSharp)
-´´´csharp
+
     using SixLabors.ImageSharp;
     using SixLabors.ImageSharp.PixelFormats;
     
@@ -107,7 +109,7 @@ Maybe you want to load a png or bitmap into TGE so i wrote a simple solution usi
             }
         }
     }
-´´´
+
 
 ***
 
