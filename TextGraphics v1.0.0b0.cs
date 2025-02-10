@@ -1,5 +1,6 @@
 ﻿/* -----------------------------------------------------------------------------------------------
  * TGE - Text Graphics Engine v1.0.0 beta-0   |   MIT License  -  Copyright (c) 2025 Mathias2246
+ * https://github.com/Mathias2246/Text-Graphics-Engine/
  * -----------------------------------------------------------------------------------------------
  */
 
@@ -459,11 +460,11 @@ namespace TextGraphics
             [JsonIgnore]
             private bool rotationLocked;
 
-            [JsonRequired]
             /// <summary>
-            /// If set to <see langword="true"/>, the rotation matrix will be locked to the current angle</br>
+            /// If set to <see langword="true"/>, the rotation matrix will be locked to the current angle<br/>
             /// otherwise the rotation matrix will be updated
-            /// <summary/>
+            /// </summary>
+            [JsonRequired]
             public bool IsRotationLocked
             {
                 get => rotationLocked; set
@@ -540,13 +541,13 @@ namespace TextGraphics
                     TextColor t = kvp.Value;
                     if (kvp.Value.bgColor.alpha != 255)
                     {
-                        t.bgColor = outputGrid.TryGetValue(kvp.Key, out TextColor? value)
+                        t.bgColor = outputGrid.TryGetValue(a, out TextColor? value)
                             ? TextColor.AlphaBlend(kvp.Value.bgColor, value.bgColor)
                             : TextColor.AlphaBlend(kvp.Value.bgColor, TextColor.Empty.bgColor);
                     }
                     if (kvp.Value.fgColor.alpha != 255)
                     {
-                        t.fgColor = outputGrid.TryGetValue(kvp.Key, out TextColor? value)
+                        t.fgColor = outputGrid.TryGetValue(a, out TextColor? value)
                             ? TextColor.AlphaBlend(kvp.Value.fgColor, value.bgColor)
                             : TextColor.AlphaBlend(kvp.Value.fgColor, TextColor.Empty.bgColor);
                     }
