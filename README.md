@@ -11,7 +11,7 @@ In the console you can even use colors that support transparency!
 
 ***
 ## Setup
-All you have to do is put the *'TextGraphics vX.X.X.cs'* file into your project.
+All you have to do is put the *'TextGraphics.cs'* file into your project.
 That's it.
 
 ## Example
