@@ -4,8 +4,22 @@
     <OutputType>Library</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>TextGraphics</RootNamespace>
+	<Company>Mathias2246</Company>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<VersionSuffix>beta</VersionSuffix>
+	<Version>1.1.0</Version>
+	<Copyright>Copyright (c) 2025 Mathias2246</Copyright>
+	<Description>TGE is an API that can be used to render text characters like images inside of your console</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;CS1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;CS1591</NoWarn>
   </PropertyGroup>
 
 </Project>
